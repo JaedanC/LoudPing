@@ -33,8 +33,5 @@ for destination_folder, src_files in additional_files:
 freeze(
     console=[{"script": "lping.py"}],
     data_files=additional_files,
-    options={
-        "bundle_files": 1,
-        "excludes": ["Tkconstants", "Tkinter", "tcl"],
-    }
+    options={}
 )
