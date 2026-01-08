@@ -41,7 +41,7 @@ class Ping:
                     self.packets_received = line_match.group(2)
                     self.packets_lost = line_match.group(3)
                     self.packets_lost_percent = line_match.group(4)
-                
+
                 line_match = final_time_regex.match(line)
                 if line_match is not None:
                     self.trip_time_min = line_match.group(1)
@@ -52,14 +52,14 @@ class Ping:
             assert self.packets_received is not None
             assert self.packets_lost is not None
             assert self.packets_lost_percent is not None
-    
+
     class ReplyType(Enum):
         Success = 0
         RequestTimedOut = 1
         DestinationHostUnreachable = 2
         DestinationNetUnreachable = 3
         GeneralFailure = 4
-    
+
     class Reply:
         def __init__(self, line: str, reply_type: Ping.ReplyType):
             self.line = line
@@ -76,7 +76,7 @@ class Ping:
                 self.bytes = int(success_match.group(2))
                 self.time = int(success_match.group(3))
                 self.ttl = int(success_match.group(4))
-            
+
             unreachable_regex = re.compile(r"Reply from (.*): Destination host unreachable.")
             if self.reply_type is Ping.ReplyType.DestinationHostUnreachable:
                 unreachable_match = re.match(unreachable_regex, line)
@@ -90,7 +90,7 @@ class Ping:
             if line_match is not None:
                 self.ip = line_match.group(1)
         assert self.ip is not None
-                
+
         self.ping_result = ping_result
         self.ip = None
         self.pings: List[Ping.Reply] = []
@@ -108,7 +108,7 @@ class Ping:
                 reply = Ping.Reply(line, Ping.ReplyType.GeneralFailure)
             elif line.startswith("Reply from"):
                 reply = Ping.Reply(line, Ping.ReplyType.Success)
-            
+
             if reply is not None:
                 self.pings.append(reply)
 
@@ -154,7 +154,7 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: lping <ip>")
         return
-    
+
     ip = sys.argv[1]
 
     play_sound_after_x_fails = 2
@@ -178,7 +178,7 @@ def main():
 
             if reply.time is not None:
                 success_times.append(reply.time)
-                
+
             if reply.reply_type is Ping.ReplyType.Success:
                 successes += 1
                 failed_in_a_row = 0
@@ -189,7 +189,7 @@ def main():
 
     except KeyboardInterrupt:
         print()
-    
+
     if packets > 0:
         print(f"Ping statistics for {ip}:")
         print("    Packets: Sent = {}, Received = {}, Lost = {} ({:.0f}% loss),".format(
@@ -206,6 +206,6 @@ def main():
                 sum(success_times)/len(success_times)
             ))
 
-              
+
 if __name__ == "__main__":
     main()
